@@ -1,0 +1,97 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+    container_name: test-app
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    links:
+      - "mongo:${DATABASE_MONGO_HOST}"
+      - "mysql:${DATABASE_MYSQL_HOST}"
+      - "redis:${DATABASE_REDIS_HOST}"
+    networks:
+      - test-web
+    depends_on:
+      - mongo
+      - mysql
+      - redis
+
+  mongo:
+    image: mongo:4.4.13
+    container_name: mongo_test_db
+    ports:
+      - ${DATABASE_MONGO_PORT}:${DATABASE_MONGO_PORT}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_MONGO_PASSWORD}
+    volumes:
+      - ./data/mongo/:/data/db
+    networks:
+      - test-web
+
+  mysql:
+    image: mysql:8.0.28
+    container_name: mysql_test_db
+    ports:
+      - ${DATABASE_MYSQL_PORT}:${DATABASE_MYSQL_PORT}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data/mysql/:/var/lib/mysql
+    networks:
+      - test-web
+
+  redis:
+    image: redis:6.2.6
+    container_name: redis_test_db
+    ports:
+      - "${DATABASE_REDIS_PORT}:${DATABASE_REDIS_PORT}"
+    volumes:
+      - ./data/redis/:/data
+      - ./data/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - test-web
+
+  elasticSearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: es-container
+    ports:
+      - ${ES_PORT}:9200
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    environment:
+      - "discovery.type=single-node"
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=false
+    networks:
+      - test-web
+
+  kibana:
+    container_name: kb-container
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es-container:9200
+      - ELASTICSEARCH_USERNAME=${KIBANA_USER}
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+    networks:
+      - test-web
+    depends_on:
+      - elasticSearch
+
+
+volumes:
+  elastic_data:
+    driver: local
+  kibana_data:
+    driver: local
+
+
+networks:
+  test-web:
+    name: test-concepts
