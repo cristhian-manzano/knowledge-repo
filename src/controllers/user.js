@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 
-const { User } = require('../models/index');
+const { User } = require('../models/mysql/index');
 
 const {
   errorResponse,
@@ -20,15 +20,26 @@ const register = async (req, res, next) => {
         message: errors.array().map((e) => `${e.param}: ${e.msg}`),
       });
 
-    const user = await User.create(req.body);
+    const [user, created] = await User.findOrCreate({
+      where: { username: req.body.username },
+      defaults: req.body,
+    });
+
+    if (!created)
+      return errorResponse({
+        res,
+        statusCode: statusCodes.BAD_REQUEST,
+        message: `username '${req.body.username}' already exists!`,
+      });
 
     return successResponse({
       res,
       statusCode: statusCodes.CREATED,
-      message: 'Created successfully',
-      data: user,
+      message: 'Created successfully!',
+      data: { id: user.id },
     });
   } catch (error) {
+    console.log('error: ', JSON.stringify(error));
     next(error);
   }
 };

@@ -13,15 +13,12 @@ module.exports = {
       timestamps: true,
     },
 
-    sync: { force: true },
-
     pool: {
       max: 5,
       idle: 30000,
       acquire: 60000,
     },
-
-    // logging: false,
+    logging: false,
   },
   test: {
     username: 'root',

@@ -1,4 +1,4 @@
-const { encrypt } = require('../helpers/encryption');
+const { encrypt } = require('../../helpers/encryption');
 
 const encryptPassword = async (user) => {
   if (!user) throw new Error('Error getting user data.');
