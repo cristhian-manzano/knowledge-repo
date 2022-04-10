@@ -6,6 +6,22 @@ module.exports = {
     port: 3306,
     host: '127.0.0.1',
     dialect: 'mysql',
+
+    define: {
+      freezeTableName: true,
+      charset: 'utf8',
+      timestamps: true,
+    },
+
+    sync: { force: true },
+
+    pool: {
+      max: 5,
+      idle: 30000,
+      acquire: 60000,
+    },
+
+    // logging: false,
   },
   test: {
     username: 'root',
