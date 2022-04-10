@@ -36,9 +36,10 @@ services:
     ports:
       - ${DATABASE_MYSQL_PORT}:${DATABASE_MYSQL_PORT}
     environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_PASSWORD}
     volumes:
       - ./data/mysql/:/var/lib/mysql
+      - ./database/mysql:/docker-entrypoint-initdb.d
     networks:
       - test-web
 
