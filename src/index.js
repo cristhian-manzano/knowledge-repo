@@ -16,10 +16,11 @@ app.use('*', (_req, res) => {
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
+  logger.error(err);
   return errorResponse({
     res,
     statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-    message: `Server error: ${err}`,
+    message: `Internal server error!`,
   });
 });
 
