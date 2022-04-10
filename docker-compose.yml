@@ -54,7 +54,7 @@ services:
     networks:
       - test-web
 
-  elasticSearch:
+  elasticSearch-container:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: es-container
     ports:
@@ -68,7 +68,7 @@ services:
     networks:
       - test-web
 
-  kibana:
+  kibana-container:
     container_name: kb-container
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
@@ -77,13 +77,13 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://es-container:9200
+      - ELASTICSEARCH_HOSTS=[http://es-container:9200]
       - ELASTICSEARCH_USERNAME=${KIBANA_USER}
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
     networks:
       - test-web
     depends_on:
-      - elasticSearch
+      - elasticSearch-container
 
 
 volumes:
